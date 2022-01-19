@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BFC</title>
+  <style>
+    p {
+      font-size: 12px;
+      color: #666;
+    }
+    .box p {
+      font-size: 12px;
+      color: #f00;
+    }
+    .box .answer {
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <h3>BFC</h3>
+  <ul>
+    <li>BFC的定义：(block formateing context)块级格式化上下文，当然还有行级格式化上下文 </li>
+    <li>BFC布局的规则：
+      <p>1.每一个子元素都占一行</p>
+      <p>2.水平上的margin不会合并，但是垂直方向上的margin会重合/合并</p>
+      <p>3.产生bfc区域的所有元素的margin也会包含在内</p>
+      <p>4.bfc会给浮动的元素不相交</p>
+      <p>5.bfc内浮动元素的高度也会计算在内</p>
+      <p>6.bfc的区域，里面不影响外面，外面也不影响里面</p>
+    </li>
+    <li>BFC形成的规则:
+      <p>1.overflow不是visibel</p>
+      <p>2.position不是 static和relative</p>
+      <p>3.float不是none</p>
+      <p>4.display的值是inline-block、table-cell、flex、table-caption或者inline-flex</p>
+    </li>
+    <li>BFC解决的问题：
+      <div class="box">
+        <p>Q: 孩子margin-top，父亲跟着一起掉下来</p>
+        <p class="answer">
+          A: 出现这个现象的是因为css盒模型中规定，所有毗邻的两个或者更多盒元素的margin将会合并为一个margin共享，
+          毗邻的定义是： 同级或者嵌套的盒元素，并且他们之间没有非空内容，padding和border分割，解决方案如下：<br>
+          1. margin-top编程父亲的padding-top，缺点就是会增加父亲的高度，还需要改变盒模型；<br>
+          2. 给父亲加上一个透明的边框，缺点就是造成1px的像素；<br>
+          3. 在第一个孩子上面追加一个table, 形成bfc,缺点是多出一个 dom，会对选择dom造成干扰；<br>
+          4. 在父亲::before：{content: '', dispaly: table };<br>
+          5. 父亲加一个overflow:hidden，形成bfc，bfc会把所有的元素magin包裹住，缺点就是超出父亲会隐藏<br>
+        </p>
+        <p>Q: 高度塌陷</p>
+        <p class="answer">
+          A: 因为父亲的高度是由孩子的高度撑起来的，一旦孩子浮动脱离文档流，那么父亲的高度将直接塌陷，解决问题如下：<br>
+          1. 父亲也浮动，但是父亲相邻的孩子也会被浮动遮住<br>
+          2. 父亲不浮动，在::after{clear: both}<br>
+          3. 父亲overflow:hidden 形成bfc, 浮动元素也会包裹在内<br>
+        </p>
+        <p>Q: 左侧宽度固定，右侧自适应</p>
+        <p class="anser">
+          1. 左侧 宽度固定，右侧父亲形成bfc，那么就不会和左侧 浮动的相互重叠了；<br>
+          2. flex: 1
+        </p>
+      </div>
+    </li>
+  </ul> 
+</body>
+</html>

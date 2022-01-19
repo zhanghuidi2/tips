@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>居中的方案</title>
+</head>
+<body>
+  <h3 style="color: #f00">Q: 居中元素是块级元素，如何居中？</h3>
+  <p> A: 块级元素的宽度是一行，所以不用居中</p>
+
+  <h3 style="color: #f00">Q: 居中元素是行内元素，如何居中？</h3>
+  <p> A: 行内元素的宽度是靠文案撑起来的，所以父亲text-alige: center,垂直居中的话，如果是一行 文字，line-height, 
+    如果是多行文字，就vertical-align: middle ,
+    vertical-align是用来设置行内元素对齐方式的。说白了就是display属性值为inline、inline-block、inline-table另加一个table-cell的元素。
+  </p>
+
+  <h3 style="color: #f00">Q: 居中元素是已知宽度的块级，如何居中？</h3>
+  <p> A: 水平方向，margin: 0 auto, 行内元素无法 使用margin: auto;
+    或者left: -50%， transfrom: translateX(-50%);
+    left: -50% + 自己宽度/2， 
+  </p>
+
+  <h3 style="color: #f00">Q: 如何居中？</h3>
+  <p> A:通用flex</p>
+
+  <h3 style="color: #f00">小tips</h3>
+  <p>行内和块级元素的嵌套</p>
+  <p>行内： span a  img i input label br</p>
+  <p>块级： div, p h1, ul, from , table</p>
+  <p>w3c明确规定，行内不能嵌套块级</p>
+  <p>块状元素可包含内联元素或某些块元素，但内联元素不可包含块元素，只能包含内联元素。<br>
+    <!-- 正确 -->
+      <div><h1></h1><p></p></div>   
+      <!-- 正确 --> 
+　　  <a href="#"><span></span></a>   
+      <!-- 错误 -->
+　　  <span><div></div></span>   
+  </p>
+  <p>
+    块级元素不能放在p标签里面<br>
+      <!-- 错误 -->
+      <!-- <p><ol><li></li></ol></p>  -->
+      <!-- 　错误 -->
+      <!-- <p><div></div></p>　 -->
+  </p>
+  <>有几个特殊块级元素只能包含内联元素，不能包含块级元素。这几个特殊标签是 h1~h6、p、dt, 包含的话样式不生效
+
+</body>
+</html>
