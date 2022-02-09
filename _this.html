@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <h3>1.面向对象的特点</h3>
+  <p>
+    说一下你对面向对象的理解，面向对象的三大特点就是封装、继承、多态。这里的三个顺序不要更换
+    <ul>
+      <li>封装，将现实中的事物具有的属性封装成一个对象，便于后面使用方便，封装的方式有2种，如果这个对象不被共用就{} || new Object();
+        如果这个对象会被共用，比如一个班级里的学生，基本都需要写学号，姓名，年龄等属性，那么需要使用构造函数
+      </li>
+      <li>继承，就是原型链，原型对象是子对象可以继承的父对象， 原型链是，子对象逐级向上访问多级副对象的链式结构</li>
+      <li>多态，就是可以重写，比如array继承object，object有自己的toString方法，但是array觉得不好用，就在自己的原型对象上重写了toString方法</li>
+    </ul>
+    <br>
+  </p>
+  
+
+  <h3>2.构造函数</h3>
+
+  <script>
+    function Student(name, age) {
+      this.name = name
+      this.age = age
+      // !!! 这里不能使用剪头函数
+      this.info = function() {
+        console.log(`${this.name} ${this.age} 岁`) // ！！！如果上面两句不写，这里能否去掉this,或者上面有那两句，这里的this能不能去掉呢
+      }
+    }
+
+    var xiaoMing = new Student('小明', 19)
+    xiaoMing.info()
+    console.log(xiaoMing) // 此时xiaoMing这个变量身上已经存在三个属性， 如果再有一个小红的对象，通过new的话，身上也有3个属性，每次读函数的话就会重新生成一段空间，造成了空间的浪费，
+    // 所以遇到构造函数里的函数，要把他放到一个公共的地方，那么存在这么一个公共的地方吗？
+    
+    // !!! 这里不能使用剪头函数，这里的this 剪头函数和普通函数分别指谁
+    Student.prototype.say = function() {
+      console.log(`${this.name} ${this.age} 岁`)
+    } // 这样写的话xiaoMing身上没有say这个属性，跑到prototype上面了
+    xiaoMing.say()
+
+  </script>
+  <h3>3.new做了什么4</h3>
+
+  <script>
+    // 1. 创建一个空对象等待
+    // 2. 将新对象继承于构造函数的原型对象，即__proro__ == prototype
+    // 3. 调用构造函数，将this变成新对象，从而使新对象拥有同样的属性
+    // 4. 返回新对象的地址
+  </script>
+  <h3>4.this的指向7种</h3>
+  <script>
+    // 1. 普通对象里的this,谁调用this指谁
+    var obj = {
+      name: '章三',
+      info: function() {
+        console.log(`${this.name}`)
+      }
+    }
+    obj.info() // 这里info函数里面的this指的是obj
+    var fun = obj.info
+    fun() // 这里this是window调用的，则会undefined,不会报错，因为此时的this是window，window是一个对象
+
+    // 2. 构造函数里的this是指新对象
+    // 3. 原型对象里的this是指将来的新对象，但是如果新对象里没有属性的话，还是会从下往上寻找，最后还是会找到原型对象里的属性
+    // eg
+
+    function Dog(name, age) {
+      this.age = age
+    }
+    Dog.prototype.name = '小狗'
+    Dog.prototype.say = function() {
+      console.log(this.name)
+    }
+
+    var dog1 = new Dog('布丁', 3)
+    dog1.say() // 这里的属性会访问到小狗
+
+    // 4. 在普通函数， 匿名函数自调， 回调函数里，this指window,不管回调函数嵌套了多少层
+    // eg
+
+    var Info =  {
+      name : ['小明', '小白', '小花'],
+      age: 4,
+      info: function() {
+        // 这里的this.name是Info调用的，所以this是Info
+        this.name.forEach(function(item){
+          console.log(`${item}-${this.age}`)
+          // 这里是回调函数，所以是window
+        })
+      }
+    }
+    Info.info() 
+    // 小明-undefined 小白-undefined 小花-undefined
+
+    // 5. 原生事件里的this，🈯️触发原生事件本身的dom, btn.click = function(e) {} !!!! 这里不能换成剪头函数
+
+    // 6. vue组件里的this，指当前vue的组件
+
+    // 7. 箭头函数，指的是自己外层的腹肌作用域，所有的匿名函数都可以使用剪头函数，如果想要内部的this和外部保持一致的话用剪头函数
+
+
+  </script>
+  <h3>5.改变this的指向3</h3>
+
+  <script>
+    function jisuan(base, a, b) {
+      console.log(`${this.name}的工资总计：${base+a+b}`)
+    }
+
+    var lilei = {
+      name: '李雷'
+    }
+    var hmm = {
+      name: '韩梅梅'
+    }
+    jisuan.call(lilei, 100, 5, 6)
+    jisuan.apply(hmm, [100, 5, 600])
+    var person = jisuan.bind(lilei, 300, 300, 600) // 永久替换this
+    person.apply(hmm, [100, 5, 600]) // bind过之后person的this就改不过来了
+    var person2 = person.bind(hmm, 500, 600, 700) // bind过之后person的this就改不过来了
+    person2() // 还是第一次的bind
+
+    var person3 = jisuan.bind(hmm, 500, 600, 700)
+    person3()
+  </script>
+
+<h3>6.创建对象的方式有10种</h3>
+<h3>7.继承的方式7</h3>
+<h3>8.深拷贝</h3>
+<script>
+  // 1. JSON.parse((JSON.stringify())) 缺点就是不能克隆undefind的数据和函数
+  // 2. 递归遍历
+  // 深克隆很浅克隆的区别是，浅克隆只鹅空一层简单类型的数据，引用类型的还是复制的内存地址
+
+  // 浅拷贝
+
+  // 1. [...] {....}
+  // 2. Object.assgin({}. obj)
+</script>
+</body>
+</html>

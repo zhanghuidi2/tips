@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <script>
+    function monther() {
+      var total = 100
+      return function(x) {
+        total -= x
+        console.log(total);
+      }
+    }
+    var pay = monther()
+    pay(1)
+    var pay2 = monther()
+    pay2(1)
+    pay(2)
+    pay2(2)
+
+    var payObj = {
+      pay: monther()
+    }
+    var pay3 = payObj.pay
+    pay3(1)
+    var pay4 = payObj.pay
+    pay4(1)
+    payObj.pay(1)
+  </script>
+</body>
+</html>
