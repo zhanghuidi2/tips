@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <script>
+    function number1() {
+      return new Promise(( resolve, reject)=> {
+        setTimeout(() => {
+          resolve('第1名跑完了')
+          // reject('第一名跑完了') 会在catch里面捕获
+
+        }, 3000)
+      })
+    }
+    function number2() {
+      return new Promise((resolve => {
+        setTimeout(() => {
+          resolve('第2名跑完了')
+        }, 2000)
+      }))
+    }
+    function number3() {
+      return new Promise((resolve => {
+        setTimeout(() => {
+          resolve('第3名跑完了')
+        }, 1000)
+      }))
+    }
+    // number1().then(res => {
+    //   console.log(res)
+    //   return res // 有返回值的话返回的是新的promise实例，返回的值就是后面拿到的数据，立即执行的
+    // }).then(res => {
+    //   console.log('res', res)
+    // })
+
+    // number1().then(res => {
+    //   console.log(res);
+    //   return number2()
+    // }).then(res => {
+    //   console.log(res);
+    //   return number3()
+    // }).then(res => {
+    //   console.log(res);
+    // }).catch(err => {
+    //   console.log('catch', err)
+    // }) // 如果返回的是promise的话，下一个then接受的是promise的对象的resolve结果
+
+
+  // try{
+  //   // await 替代的是then 一旦使用了await，前一项任务的resolve(返回值)，可以像普通函
+//数一样用=接住。后续代码可继续使用该变量里获得的返回值。
+  //   (async function() {
+  //     const res1 = await number1() // await的结果会返回resolve中的数据
+  //     console.log(res1);
+  //     const res2 = await number2()
+  //     console.log(res2);
+  //     const res3 = await number3()
+  //     console.log(res3);
+  //   })()
+  // }catch(err) {
+  //   console.log(err)
+  // }
+
+  // 同时跑，最后全部拿到结果才会then
+  Promise.all([number1(), number2(), number3()]).then(Res => {
+    console.log(Res)
+  })
+
+  // 同时跑，但是谁先跑完谁先then
+  Promise.race([number1(), number2(), number3()]).then(Res => {
+    console.log(Res)
+  })
+
+
+  </script>
+</body>
+</html>
+
+
