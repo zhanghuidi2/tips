@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+
+  <script>
+    function monther() {
+      var total = 100
+      return function(x) {
+        total -= x
+      }
+    }
+    var pay = monther()
+    pay(1)
+    pay(2)
+  </script>
+
+
+
+  <script>
+    function monther() {
+      debugger
+      var total = 100
+      return function(x) {
+        total -= x
+        console.log(total);
+      }
+    }
+    var pay = monther()
+    pay(1)
+    var pay2 = monther()
+    pay2(1)
+    pay(2)
+    pay2(2)
+
+    // !!!!!!!
+    var payObj = {
+      pay: monther()
+    }
+    var pay3 = payObj.pay
+    pay3(1)
+    var pay4 = payObj.pay
+    pay4(1) 
+    payObj.pay(1) 
+
+  </script>
+
+
+  <script>
+    function monther() {
+      var total = 100
+      newPay = function() {
+        total++
+        console.log(total)
+      }
+      return function(x) {
+        total -= x
+        console.log(total)
+      }
+    }
+    var pay = monther()
+    pay(1) // 99 
+    newPay() // 100
+    pay(2) // 98
+  </script>
+
+
+  <script>
+    let foo = function(){
+      let i = 0;
+      return function(){
+        console.log(i++); // 假如这里换成++i
+      }
+    }
+    let f1 = foo();
+    let f2 = foo();
+    f1() // 0
+    f2() // 0
+    f1() // 1
+  </script>
+
+
+  <script>
+    let x = 100;
+    let y = 200;
+    let funA = function(x){
+      x += 1;
+      let y = 201;
+      let funB = function(){
+        console.log(x); // 102
+        console.log(y); // 201
+      }
+      // funC = function() {
+      //   console.log(x) // 102
+      // }      
+      return funB;
+
+
+    }
+    let f = funA(101);
+    f();
+    // funC()
+  </script>
+
+
+
+  <script>
+    var nAdd;
+    function out(){
+      var n = 999;
+      nAdd = function(){ 
+        n ++; 
+        console.log(n)
+      }
+      return function(){
+        console.log(n); 
+      }
+    }
+    var getN = out();
+    getN();   // 999 
+    nAdd(); // 1000
+    getN(); // 1000
+  </script>
+
+
+
+  <script>
+    function test(){
+      var arr = [];
+      for(var i=0;i<3;i++){
+        (function(j){
+          arr[j] = function(){
+            console.log(j)
+          }
+        }(i))
+      }
+      return arr;
+    }
+    var myArr = test();
+    myArr[0]();
+    myArr[1]();
+    myArr[2]();
+    
+  </script>
+
+
+
+  <script>
+    function fun(){
+      var i=1;
+      return function(){
+        console.log(i++)
+      }
+    }
+    var getFun = fun();
+    getFun();
+    getFun();
+    var i=2;
+    getFun();
+    getFun();
+  </script>
+
+
+
+  <script>
+    function fn(){
+      var a = 1;
+      function b(){
+        a++;
+        console.log(a)
+      }
+      function c(){
+        a--;
+        console.log(a)
+      }
+      a  += 10;
+      return [b,c];
+    }
+    var arr = fn();
+    arr[0]();
+    arr[1]()
+
+  </script>
+
+
+
+  <script>
+    var add = function(x) {
+      var sum = x;
+      var tmp = function(x) {
+          sum = sum + x;
+          return tmp;
+      }
+      tmp.toString = function() {
+          return sum;
+      }
+      return tmp;
+    }
+    alert(add(1)(2)(3))
+  </script>
+
+
+
+  <script>
+    function f() {
+      var count = 0;
+      return function() {
+      
+        console.log(count++);
+      }
+    }
+    var t1 = f();
+    t1();
+    t1();
+    t1(); 
+  </script>
+
+
+
+  <script>
+    function a() {
+        var i = 0;
+        function b() {
+            console.log(++i);
+        }
+        return b;
+    }
+    var c = a();
+    c(); 
+    c();
+  </script>
+
+
+
+  <script>
+    (function() {
+        var m = 0;
+        function getM() {
+          // debugger // 闭包是自执行函数，自执行函里的this指向window
+          return m;
+        }
+        function seta(val) {
+            m = val;
+        }
+        window.g = getM; 
+        window.f = seta;
+    })();
+    f(100);
+    console.log(g());
+    console.log(window.m) // undefined
+  </script>
+
+
+
+  <script>
+    function f() {
+        var num = 1;
+        function g() {
+            console.log(num);
+        }
+        num++;
+        g(); 
+    }
+
+    f()
+  </script>
+
+
+<script>
+
+  // !!!!!!
+  var num = 1,
+    obj = {
+        num: 2,
+        fn: (function (num) {
+            // 自执行函数this指向window
+
+            // debugger
+            this.num *= 2; 
+            num += 2; // 3
+
+            return function () {
+                this.num *= 3; 
+                num ++; 
+                console.log(num); 
+            }
+        })(num)
+    };
+    var fn = obj.fn; // window.num = 2  num = 3
+    fn(); // 4 // window.num = 6 闭包里的num = 4
+    console.log(num, obj.num) // 6 2
+    obj.fn(); // 5  // 
+    console.log(num, obj.num); // 6 6
+</script>
+
+
+
+<script>
+  var foo = 1;
+  function bar() {
+      if(!foo){
+          var foo = 100; 
+      }
+      console.log(foo);
+  }
+  bar();
+</script>
+
+
+
+<script>
+  var foo = 'hello';
+  (function (foo) {
+      // var foo = 'hello'
+      console.log(foo); 
+      var foo = foo || 'world';
+      console.log(foo);
+  })(foo);
+  console.log(foo);
+</script>
+
+
+
+<script>
+  // !!!!!
+  // var a = 10 console.log(a++)
+  var a = 9;
+  function fn() {
+      a = 0;
+      return function (b) {
+          return b + a ++;
+      }
+  }
+  var f = fn();
+  console.log(f(5)); // 5
+  console.log(fn()(5));  // 没有闭包 5
+  console.log(f(5)); // 6
+  console.log(a); // 2
+</script>
+
+
+
+<script>
+  // !!！
+  var ary = [1,2,3,4];
+  function fn(ary) {
+      ary[0] = 0;
+      ary = [0];
+      ary[0] = 100;
+      return ary;
+  }
+  var res = fn(ary);
+  console.log(ary);
+  console.log(res);
+</script>
+
+
+
+<script>
+  // !!!!
+  function fn(i) {
+    return function (n) {
+        console.log(n + (i++));
+    }
+  }
+  var f = fn(10);
+  f(20); // 30
+  fn(20)(40); // 60
+  fn(30)(50); // 80
+  f(30); // 41
+</script>
+
+
+
+<script>
+  // !!!!
+var num = 10;
+var obj = {num: 20};
+  obj.fn = (function (num) {
+        
+      this.num = num*3; 
+      debugger
+      num ++;
+      return function (n) {
+          this.num += n;
+          num ++;
+          console.log(num);
+      }
+  })(obj.num); 
+  
+  
+  // num  12 13 35 30                       // obj.num
+
+  // window : num 10  30 35          num 10 60 65
+  //          obj : {                 obj: {
+  //            num : 20 30               num: 20
+  //            fn: 0*1234                fm: 0*1234
+  //          }
+
+// 
+
+
+
+  var fn = obj.fn;
+  fn(5); // 22
+  obj.fn(10); // 23
+  console.log(num, obj.num); // 65 30
+  </script>
+
+
+
+  <script>
+    var name = "window"
+    var p = {
+      name: 'perter',
+      getName: function() {
+        var self = this
+        return function() {
+          return self.name
+        }
+      }
+    }
+    var getName = p.getName()
+    var _name = getName()
+    console.log(_name)
+  </script>
+
+
+
+  <script>
+    // !!!
+    function fun(n,o) {
+      console.log(o)
+      return {
+        fun: function(m) {
+          return fun(m,n)
+        }
+      }
+    }
+    var a = fun(0);  // undefined
+    a.fun(1); // 0
+    a.fun(2) // 0
+    a.fun(3) // 0
+    var b = fun(0) // undefined
+    .fun(1) // 0
+    .fun(2) // 1
+    .fun(3) // 2
+
+    var c = fun(0).fun(1) // undefined 0
+    c.fun(2) // 1
+    c.fun(3) // 1
+  </script>
+
+
+<script>
+  // !!!!
+  var a = 2
+  var obj = {
+    a: 4,
+    fn1: (function() {
+      debugger
+      this.a *=2
+      var a = 3
+      return function() {
+        this.a *= 2
+        a *= 3
+        console.log(a)
+      }
+    })()
+  }
+
+  // 自执行函数是在声明的时候就执行了，声明过后只是一个内存地址
+  // 
+
+  var fn1 = obj.fn1
+  console.log(a) // 4
+  fn1() // win a =8   9
+  obj.fn1() // 27 // obj a = 8
+  // var fn2 = obj.fn1
+  // fn2()
+  console.log(a) // 8
+  console.log(obj.a) // 8
+
+
+  // !!!
+  // 先执行obj.fn1()  // 9 4， 8
+</script>
+
+
+<script>
+
+var a = 2
+    var obj = {
+      a: 4,
+      fn1: (
+        function() {
+          this.a *=2
+          var a = 3
+          return function() {
+            this.a *= 2
+            a*=3
+            console.log(a)
+          }
+        }
+      )() // 匿名函数自调，相当于obj的fn1 是接收了一个孩子，所以fn1的作用域链有2个
+    }
+    var fn1 = obj.fn1
+    var fn2 = obj.fn1
+    fn2()
+    console.log(a) // 4
+    fn1() // 9
+    obj.fn1() // 27
+    console.log(a) // 8
+    console.log(obj.a) // 8
+
+
+
+    // var name = 'ii'
+    var obj = {
+      name: 'liai',
+      int: function() {
+        debugger
+        console.log(this)
+        console.log(`${this.name}oooo`)
+      }
+    }
+    obj.int()
+    var a = obj.int
+    a()
+</script>
+
+</body>
+</html>

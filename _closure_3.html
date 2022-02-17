@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,17 +11,19 @@
   <script>
     function monther() {
       var total = 100
-      newPay = function(total) {
+      newPay = function() {
         total++
+        console.log(total)
       }
       return function(x) {
         total -= x
+        console.log(total)
       }
     }
     var pay = monther()
-    pay(1)
-    newPay()
-    pay(2)
+    pay(1) // 99 
+    newPay() // 100
+    pay(2) // 98
   </script>
 </body>
 </html>
