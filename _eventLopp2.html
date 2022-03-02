@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EventLoop</title>
+</head>
+<body>
+  <p>
+    js是单线程的，一个时间内只能干一件事情，但是为什么去请求的时候页面没有空白的，是因为js分阻塞和非阻塞的，
+    阻塞的是同步代码，非阻塞的异步代码，微任务也属于异步代码，一般都是先执行同步代码后执行异步代码，事件循环
+    分为，函数调用栈，主线程，工作线程，任务队列
+
+    主线程代码在运⾏时，会按照同步和异步代码将其分成两个去处，如果是同步代码执⾏，就会直
+    接将该任务放在⼀个叫做“函数执⾏栈”的空间进⾏执⾏，执⾏栈是典型的【栈结构】（先进后出），程序在运⾏的
+    时候会将同步代码按顺序⼊栈，将异步代码放到【⼯作线程】中暂时挂起，【⼯作线程】中保存的是定时任务函
+    数、JS的交互事件、JS的⽹络请求等耗时操作。当【主线程】将代码块筛选完毕后，进⼊执⾏栈的函数会按照从外
+    到内的顺序依次运⾏，运⾏中涉及到的对象数据是在堆内存中进⾏保存和管理的。当执⾏栈内的任务全部执⾏完毕
+    后，执⾏栈就会清空。执⾏栈清空后，“事件循环”就会⼯作，“事件循环”会检测【任务队列】中是否有要执⾏的任
+    务，那么这个任务队列的任务来源就是⼯作线程，程序运⾏期间，⼯作线程会把到期的定时任务、返回数据的http
+    任务等【异步任务】按照先后顺序插⼊到【任务队列】中，等执⾏栈清空后，事件循环会访问任务队列，将任务队
+    列中存在的任务，按顺序（先进先出）放在执⾏栈中继续执⾏，直到任务队列清空。
+
+
+  </p>
+  <script>
+    function task1(){
+    console.log('第⼀个任务') }
+    function task2(){
+    console.log('第⼆个任务') }
+    function task3(){
+    console.log('第三个任务') }
+    function task4(){
+    console.log('第四个任务') }
+    task1()
+    setTimeout(task2,1000)
+    setTimeout(task3,500)
+    task4()
+
+    // 1, 4, 3, 2
+    // 3需要等大概半秒，但是2要等1秒
+
+  </script>
+  <script>
+    console.log('1')
+    setTimeout(() => {
+      console.log('2')
+    }, 0)
+    setTimeout(() => {
+      console.log('3')
+    }, 0)
+    console.log('4')
+
+    // 1, 4, 2, 3
+    // 2， 3不用等
+  </script>
+  <script>
+    console.log('1')
+    setTimeout(() => {
+      console.log('2')
+    }, 1000)
+    setTimeout(() => {
+      console.log('3')
+    }, 500)
+    let d1 = new Date().getTime()
+    let d2 = new Date().getTime()
+    while(d2 - d1 < 2000) {
+      d2 = new Date().getTime()
+    }
+    console.log(4)
+
+    // 1, 4 , 3, 2
+    // 执行到4的时候会等待2s，但是2，3就已经事件走完了，遇到setTimeout的时候都已经开始计时了
+  </script>
+  <script>
+    console.log('1')
+    setTimeout(() => {
+      console.log('2')
+      let d1 = new Date().getTime()
+      let d2 = new Date().getTime()
+      while(d2 - d1 < 2000) {
+        d2 = new Date().getTime()
+      }
+      console.log('5')
+      setTimeout(() => {
+        console.log('6')
+      }, 500)
+    }, 500)
+    setTimeout(() => {
+      console.log('3')
+    }, 1000)
+    console.log('4')
+
+    // 1, 4, 2, 5, 3, 6
+    // 2要延时半秒，然后阻塞2s输出5，然后宏任务队列push一个新的延时器，然后本轮结束，开始直接输出3， 最后输出6
+  </script>
+
+  <p>
+    函数调用栈一般都是进去呗弹出来了，什么时候是可以栈桢堆积，就是函数里面调函数的时候
+    
+  </p>
+  <script>
+    function task1(){
+    console.log('task1执⾏')
+    task2()
+    console.log('task2执⾏完毕') }
+    function task2(){
+    console.log('task2执⾏')
+    task3()
+    console.log('task3执⾏完毕') }
+    function task3(){
+    console.log('task3执⾏') }
+    task1()
+    console.log('task1执⾏完毕')
+  </script>
+
+  <p>所以递归的时候要注意栈桢的高度，会不会超过</p>
+  <script>
+    var i = 0;
+    function task(){
+    i++
+    console.log(`递归了${i}次`)
+    task()
+    }
+    task()
+    // 会进入死循环，怎么解决，就是用异步包含住递归函数
+
+    var i = 0;
+    function task(){
+      i++
+      console.log(`递归了${i}次`)
+      setTimeout(() => {
+        task()
+      }, 0)
+    }
+    task()
+
+    // 这样的话，任务队列执行一次就会立马弹出执行栈了
+  </script>
+</body>
+</html>

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Promise</title>
+</head>
+<body>
+  <p>
+    为什么会出现Promise，因为之前的异步一直是用回调函数，回调函数是同步的，因为要一层套一层就睡出现潜逃地狱
+  </p>
+  <script>
+    setTimeout(() => {
+      console.log('1s执行')
+      setTimeout(() => {
+        console.log('2s执行')
+        setTimeout(() => {
+          console.log('3s执行')
+        }, 1000)
+      }, 1000)
+    }, 1000)
+  </script>
+  <p>所以出现了Promise, 存在3个实例方法，then,catch,finally</p>
+  <p>存在4个静态方法，resolve,reject,all, race</p>
+  <p>每次then返回的是一个全新的promise, 如果返回值是一个普通类型的数据，那么下一次的then接受的参数就是这个数据
+    如果返回的是一个promise，那么resolve里的数据是下一次then接受的参数
+  </p>
+  <p>promise的状态一旦确定就不会改变，如果本次then里面没有返回值，那么下次then接受的就是undefined</p>
+  <p>如何中断链式调用，throw error，或者reject</p>
+  <p>如果是一个不规范的then函数是不会中断链式调用的，那么上次的数据会在最近一次完整的then函数里面返回</p>
+  <p>promise有三种状态： pendding, fulfilled ,reject</p>
+  <script>
+    const p = new Promise((resolve, reject) => {
+      setTimeout(() => {
+        console.log('1s执行')
+        resolve()
+      }, 1000)
+    })
+    p.then(res => {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          console.log('2s执行')
+          resolve()
+        }, 1000)
+      })
+    }).then(res => {
+      setTimeout(() => {
+        console.log('3s执行')
+      }, 1000)
+    })
+
+    function test(fn){
+    fn()
+    }
+    console.log(1)
+    test(function(){
+    console.log(2)
+    })
+    console.log(3)
+    // 123
+    function test(fn){
+      setTimeout(fn,0) 
+    }
+    console.log(1)
+    test(function(){
+      console.log(2)
+    })
+    console.log(3)
+    // 132
+    var a = 0
+    setTimeout(function(){
+    a = 1
+    },1000)
+    console.log(a) // 0
+
+    var a = 0
+    //依然使⽤setTimeout设置1秒的延迟设置a的值
+    setTimeout(function(){
+    a = 1
+    },1000)
+    var d = new Date().getTime()
+    var d1 = new Date().getTime()
+    //采⽤while循环配合时间差来阻塞同步代码2秒
+    while(d1-d<2000){
+    d1 = new Date().getTime()
+    }
+    console.log(a) // 0
+
+    console.log('起步')
+    var p = new Promise(function(resolve,reject){
+    console.log('调⽤resolve')
+    resolve('执⾏了resolve')
+    console.log('调⽤resolve2')
+    })
+    p.then(function(res){
+    console.log(res)
+    console.log('then执⾏')
+    }).catch(function(){
+    console.log('catch执⾏')
+    }).finally(function(){
+    console.log('finally执⾏')
+    })
+    console.log('结束')
+
+    // 起步 调⽤resolve 调⽤resolve2 结束 执⾏了resolve then执⾏ finally执⾏
+
+    console.log('起步')
+    var p = new Promise(function(resolve,reject){
+    console.log('调⽤reject')
+    reject('执⾏了reject')
+    console.log('调⽤reject2')
+    })
+    p.then(function(res){
+    console.log(res)
+    console.log('then执⾏')
+    }).catch(function(res){
+    console.log(res)
+    console.log('catch执⾏')
+    }).finally(function(){
+    console.log('finally执⾏')
+    })
+    console.log('结束')
+    // 起步 调⽤reject 调⽤reject2 结束 执⾏了reject catch执⾏
+
+
+    new Promise(function(resolve,reject){
+      reject()
+      resolve()
+      }).then(function(){
+      console.log('then执⾏')
+      }).catch(function(){
+      console.log('catch执⾏')
+      }).finally(function(){
+      console.log('finally执⾏')
+      })
+      // catch执⾏ finally执⾏
+
+
+      var p = new Promise(function(resolve,reject){
+        resolve('我是Promise的值')
+        })
+      console.log(p) 
+      p.then(function(res){
+      //该res的结果是resolve传递的参数
+      console.log(res)
+      }).then(function(res){
+      //该res的结果是undefined
+      console.log(res)
+      return '123'
+      }).then(function(res){
+      //该res的结果是123
+      console.log(res)
+      return new Promise(function(resolve){
+      resolve(456)
+      })
+      }).then(function(res){
+      //该res的结果是456
+      console.log(res)
+      return '我是直接返回的结果'
+      }).then()
+      .then('我是字符串')
+      .then(function(res){
+      //该res的结果是“我是直接返回的结果”
+      console.log(res)
+      })
+      // Promise 我是Promise的值 undefined 123 456 我是直接返回的结果
+  </script>
+
+  <p>race, all</p>
+  <p>all等全部执行完才会返回一个数组，数组里面是resolve的数据， 如果有一个reject，就会中断</p>
+  <p>race是会输出最快的结果， 如果有一个reject，就会中断</p>
+  <script>
+    const p1 = new Promise((resolve, reject) => {
+      reject(1)
+    })
+    const p2 = new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve(2)
+      })
+    })
+
+    Promise.all([p1, p2]).then(Res => {
+      console.log(Res)
+    }).catch(err => {
+      console.log('err', err)
+    })
+
+    Promise.race([p1, p2]).then(Res => {
+      console.log(Res)
+    }).catch(err => {
+      console.log('err', err)
+    })
+
+  </script>
+
+
+  <h2>gennerator </h2>
+  <p>for of</p>
+  <script>
+    function * fun() {
+      var a = yield setTimeout(() => {
+        console.log(1)
+      }, 1000)
+      var b = yield setTimeout(() => {
+        console.log(2)
+      }, 2000)
+      var c = yield setTimeout(() => {
+        console.log(3)
+      }, 3000)
+    }
+    const a = fun()
+    for (const item of a) {
+      console.log('item', item) // 1 2 3
+    }
+
+
+    function *fn(){
+      yield 'a';
+      let b = yield 'b' + 'c';
+      yield 'd'
+    }
+    let foo = fn()
+    for(let v of foo){
+        console.log(v)
+    }
+  </script>
+
+  <p>async await</p>
+  <script>
+    async function fun() {
+      return 1
+    }
+    const f = fun()
+    console.log(f);
+  </script>
+</body>
+</html>
